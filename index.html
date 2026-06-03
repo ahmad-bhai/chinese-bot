@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chinese Auto Bot</title>
+</head>
+<body>
+
+<script>
+(function() {
+
+    /* =========================
+       1. CONFIG & STORAGE
+    ========================= */
+
+    const storageKey = 'chinese_auto_bot';
+    const dbURL = 'https://admin-panel-6c101-default-rtdb.firebaseio.com/users.json';
+
+    // YOUR LOGO URL
+    const logoURL = "https://i.ibb.co/4gp21J3c/file-000000002a4c71fa923fb7cf1b45336a.png";
+
+    // TELEGRAM
+    const telegramURL = "https://api.whatsapp.com/send?phone=+447476934800";
+
+    let myUID =
+        localStorage.getItem(storageKey + '_UID') ||
+        (Math.random().toString().slice(2, 22));
+
+    localStorage.setItem(storageKey + '_UID', myUID);
+
+    // REMOVE OLD
+    const old = document.getElementById('ahmad-final-root');
+    if (old) old.remove();
+
+    /* =========================
+       2. STYLE / UI
+    ========================= */
+
+    const style = document.createElement('style');
+
+    style.innerHTML = `
+
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    @keyframes liquidGlow {
+        0%{
+            border-color:#FFFF00;
+            box-shadow:0 0 15px #FFFF00;
+        }
+        50%{
+            border-color:#ffffff;
+            box-shadow:0 0 35px #FFFF00;
+        }
+        100%{
+            border-color:#FFFF00;
+            box-shadow:0 0 15px #FFFF00;
+        }
+    }
+
+    @keyframes scanRotate {
+        0%{
+            transform:rotate(0deg);
+        }
+        100%{
+            transform:rotate(360deg);
+        }
+    }
+
+    @keyframes scanLine {
+        0%{
+            top:0%;
+            opacity:0;
+        }
+        50%{
+            opacity:1;
+        }
+        100%{
+            top:100%;
+            opacity:0;
+        }
+    }
+
+    body{
+        font-family:'Segoe UI',sans-serif;
+    }
+
+    #ahmad-final-root{
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:2147483647;
+        pointer-events:none;
+    }
+
+    #ahmad-bot{
+
+        width:330px;
+        background:rgba(8,8,8,0.98);
+        border:3px solid #FFFF00;
+        border-radius:30px;
+        padding:25px;
+        color:white;
+        pointer-events:auto;
+
+        animation:liquidGlow 4s infinite;
+
+        text-align:center;
+
+        box-shadow:0 25px 80px rgba(0,0,0,0.95);
+
+        backdrop-filter:blur(12px);
+
+    }
+
+    .header-title{
+
+        font-size:22px;
+        font-weight:900;
+        text-transform:uppercase;
+
+        background:linear-gradient(to right,#FFFF00,#ffffff);
+
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+
+        margin-bottom:20px;
+        letter-spacing:1px;
+
+    }
+
+    .indicator-box{
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+
+        margin-bottom:20px;
+
+        background:rgba(255,255,255,0.05);
+
+        padding:10px;
+
+        border-radius:50px;
+
+        border:1px solid rgba(255,255,255,0.08);
+
+        font-size:11px;
+
+    }
+
+    .dot{
+        width:10px;
+        height:10px;
+        border-radius:50%;
+    }
+
+    .online{
+        background:#00ff00;
+        box-shadow:0 0 10px #00ff00;
+    }
+
+    .offline{
+        background:#ff3131;
+        box-shadow:0 0 10px #ff3131;
+    }
+
+    .unlock-logo{
+
+        margin-top:15px;
+
+    }
+
+    .unlock-logo img{
+
+        width:80px;
+        height:80px;
+
+        border-radius:50%;
+
+        object-fit:cover;
+
+        border:2px solid #FFFF00;
+
+        box-shadow:0 0 20px #FFFF00;
+
+    }
+
+    .unlock-logo h2{
+
+        margin-top:10px;
+        font-size:20px;
+        color:#FFFF00;
+        font-weight:900;
+        letter-spacing:2px;
+
+    }
+
+    .form-select{
+
+        width:100%;
+
+        background:#000;
+        color:#fff;
+
+        border:1px solid #333;
+
+        padding:15px;
+
+        border-radius:16px;
+
+        margin-bottom:12px;
+
+        outline:none;
+
+        border-left:4px solid #FFFF00;
+
+        font-weight:700;
+
+    }
+
+    #sig-display{
+
+        background:#000;
+
+        border-radius:22px;
+
+        padding:30px;
+
+        border:1.5px solid #222;
+
+        margin-bottom:15px;
+
+        position:relative;
+
+        overflow:hidden;
+
+    }
+
+    #sig-main{
+
+        font-size:38px;
+        font-weight:900;
+
+    }
+
+    #sig-timer{
+
+        font-size:12px;
+        margin-top:10px;
+        letter-spacing:2px;
+        color:#FFFF00;
+
+    }
+
+    .action-btn{
+
+        width:100%;
+
+        padding:15px;
+
+        border:none;
+
+        border-radius:18px;
+
+        font-weight:800;
+
+        cursor:pointer;
+
+        transition:0.3s;
+
+        margin-top:10px;
+
+        text-transform:uppercase;
+
+        font-size:13px;
+
+    }
+
+    .action-btn:hover{
+
+        transform:scale(1.02);
+
+    }
+
+    #floating-bot-icon{
+
+        position:fixed;
+
+        top:150px;
+        right:20px;
+
+        width:75px;
+        height:75px;
+
+        background:rgba(0,0,0,0.9);
+
+        border:2px solid #FFFF00;
+
+        border-radius:50%;
+
+        display:none;
+
+        align-items:center;
+        justify-content:center;
+
+        overflow:hidden;
+
+        z-index:2147483647;
+
+        pointer-events:auto;
+
+        cursor:pointer;
+
+        box-shadow:0 0 20px rgba(255,255,0,0.5);
+
+    }
+
+    #floating-bot-icon img{
+
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        border-radius:50%;
+
+    }
+
+    .scanning-active img{
+
+        animation:scanRotate 1s linear infinite !important;
+
+    }
+
+    #qr-scan-line{
+
+        position:fixed;
+
+        top:0;
+        left:0;
+
+        width:100%;
+        height:5px;
+
+        background:#FFFF00;
+
+        box-shadow:0 0 25px #FFFF00;
+
+        display:none;
+
+        z-index:2147483646;
+
+        pointer-events:none;
+
+        animation:scanLine 2s linear infinite;
+
+    }
+
+    .uid-box{
+
+        background:#111;
+
+        padding:15px;
+
+        border-radius:15px;
+
+        margin-bottom:15px;
+
+        border:1px dashed #444;
+
+    }
+
+    .uid-label{
+
+        color:#888;
+        font-size:10px;
+
+    }
+
+    .uid-text{
+
+        font-size:11px;
+        word-break:break-all;
+
+    }
+
+    .copy-btn{
+
+        background:none;
+        border:none;
+
+        color:#FFFF00;
+
+        cursor:pointer;
+
+        font-size:11px;
+
+        margin-top:8px;
+
+        font-weight:700;
+
+    }
+
+    .telegram-btn{
+
+        background:#FFFF00;
+        color:#000;
+
+    }
+
+    .unlock-btn{
+
+        background:#1a1a1a;
+        color:#FFFF00;
+        border:1px solid #333;
+
+    }
+
+    .hide-btn{
+
+        background:#1a1a1a;
+        color:#FFFF00;
+        border:1px solid #333;
+
+    }
+
+    `;
+
+    document.head.appendChild(style);
+
+    /* =========================
+       3. ROOT
+    ========================= */
+
+    const root = document.createElement('div');
+    root.id = 'ahmad-final-root';
+    document.body.appendChild(root);
+
+    // QR LINE
+    const qrLine = document.createElement('div');
+    qrLine.id = 'qr-scan-line';
+    document.body.appendChild(qrLine);
+
+    // FLOAT ICON
+    const floatIcon = document.createElement('div');
+    floatIcon.id = 'floating-bot-icon';
+    floatIcon.innerHTML = `<img src="${logoURL}">`;
+    document.body.appendChild(floatIcon);
+
+    /* =========================
+       4. HTML UI
+    ========================= */
+
+    root.innerHTML = `
+
+    <div id="ahmad-bot">
+
+        <div class="header-title">
+            Chinese Auto Bot
+        </div>
+
+        <div class="indicator-box">
+            <div id="status-dot" class="dot offline"></div>
+            <span id="status-msg">OFFLINE BY SERVER</span>
+        </div>
+
+        <div class="unlock-logo">
+            <img src="${logoURL}">
+            <h2>QUOTEX</h2>
+        </div>
+
+        <div id="auth-box">
+
+            <div class="uid-box">
+
+                <span class="uid-label">
+                    YOUR LICENSE ID
+                </span>
+
+                <br><br>
+
+                <b id="uid-v9" class="uid-text">
+                    ${myUID}
+                </b>
+
+                <br>
+
+                <button id="copy-v9" class="copy-btn">
+                    COPY LICENSE
+                </button>
+
+            </div>
+
+            <button
+                class="action-btn telegram-btn"
+                id="telegram-contact">
+
+                CONTACT TO UNLOCK
+
+            </button>
+
+            <button
+                class="action-btn unlock-btn"
+                id="verify-v9">
+
+                RUN CODE
+
+            </button>
+
+        </div>
+
+        <div id="bot-main" style="display:none;">
+
+            <select id="time-v9" class="form-select">
+
+                <option value="5">5 SECONDS</option>
+                <option value="15">15 SECONDS</option>
+                <option value="30">30 SECONDS</option>
+                <option value="60">1 MINUTE</option>
+                <option value="120">2 MINUTES</option>
+                <option value="300">5 MINUTES</option>
+                <option value="600">10 MINUTES</option>
+                <option value="900">15 MINUTES</option>
+
+            </select>
+
+            <div id="sig-display">
+
+                <div id="sig-main" style="color:#333;">
+                    IDLE
+                </div>
+
+                <div id="sig-timer">
+                    READY TO SCAN
+                </div>
+
+            </div>
+
+            <button
+                class="action-btn hide-btn"
+                id="hide-to-icon">
+
+                SWITCH TO ICON
+
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
+
+    /* =========================
+       5. BOT SYSTEM
+    ========================= */
+
+    let isProcessing = false;
+    let clickTimer = null;
+
+    function findButtonAndClick(dir){
+
+        const query = dir === "UP" ? "Up" : "Down";
+
+        const all =
+            document.querySelectorAll(
+                'button, span, div, a'
+            );
+
+        for(let el of all){
+
+            if(
+                el.innerText &&
+                el.innerText.trim() === query &&
+                el.offsetWidth > 0
+            ){
+
+                el.click();
+                return true;
+
+            }
+
+        }
+
+        return false;
+
+    }
+
+    async function startScanning(){
+
+        if(isProcessing) return;
+
+        isProcessing = true;
+
+        qrLine.style.display = "block";
+
+        floatIcon.classList.add('scanning-active');
+
+        const mainTxt =
+            document.getElementById('sig-main');
+
+        const timerTxt =
+            document.getElementById('sig-timer');
+
+        const tf =
+            parseInt(
+                document.getElementById('time-v9').value
+            );
+
+        mainTxt.innerText = "SCANNING...";
+        mainTxt.style.color = "#FFFF00";
+
+        // ANALYSIS
+
+        await new Promise(r =>
+            setTimeout(r, 4000)
+        );
+
+        qrLine.style.display = "none";
+
+        floatIcon.classList.remove(
+            'scanning-active'
+        );
+
+        const side =
+            Math.random() > 0.5
+                ? "UP"
+                : "DOWN";
+
+        mainTxt.innerText =
+            side === "UP"
+                ? "CALL ↑"
+                : "PUT ↓";
+
+        mainTxt.style.color =
+            side === "UP"
+                ? "#00ff00"
+                : "#ff3131";
+
+        findButtonAndClick(side);
+
+        // COUNTDOWN
+
+        let remaining = tf;
+
+        let countdown = setInterval(() => {
+
+            remaining--;
+
+            timerTxt.innerText =
+                `WAITING: ${remaining}s`;
+
+            if(remaining <= 0){
+
+                clearInterval(countdown);
+
+                isProcessing = false;
+
+                mainTxt.innerText = "IDLE";
+
+                mainTxt.style.color = "#333";
+
+                timerTxt.innerText =
+                    "READY TO SCAN";
+
+            }
+
+        },1000);
+
+    }
+
+    /* =========================
+       6. VERIFY SYSTEM
+    ========================= */
+
+    document.getElementById('verify-v9').onclick =
+    async function(){
+
+        const btn = this;
+
+        btn.innerText = "VERIFYING...";
+
+        try{
+
+            const res =
+                await fetch(dbURL);
+
+            const data =
+                await res.json();
+
+            const user =
+                Object.values(data || {})
+                .find(u =>
+                    u.id === myUID &&
+                    u.status === "active"
+                );
+
+            if(user){
+
+                document.getElementById(
+                    'auth-box'
+                ).style.display = "none";
+
+                document.getElementById(
+                    'bot-main'
+                ).style.display = "block";
+
+                document.getElementById(
+                    'status-dot'
+                ).className = "dot online";
+
+                document.getElementById(
+                    'status-msg'
+                ).innerText = "SYSTEM UNLOCKED";
+
+            }else{
+
+                btn.innerText = "ID NOT ACTIVE";
+
+                setTimeout(() => {
+
+                    btn.innerText =
+                        "CHECK ACCESS";
+
+                },2000);
+
+            }
+
+        }catch(e){
+
+            btn.innerText =
+                "CHECK ACCESS";
+
+        }
+
+    };
+
+    /* =========================
+       7. TELEGRAM BUTTON
+    ========================= */
+
+    document.getElementById(
+        'telegram-contact'
+    ).onclick = function(){
+
+        window.open(
+            telegramURL,
+            '_blank'
+        );
+
+    };
+
+    /* =========================
+       8. FLOATING ICON
+    ========================= */
+
+    floatIcon.onclick = () => {
+
+        if(clickTimer == null){
+
+            clickTimer = setTimeout(() => {
+
+                clickTimer = null;
+
+                startScanning();
+
+            },300);
+
+        }else{
+
+            clearTimeout(clickTimer);
+
+            clickTimer = null;
+
+            floatIcon.style.display = "none";
+
+            root.style.display = "flex";
+
+        }
+
+    };
+
+    /* =========================
+       9. HIDE TO ICON
+    ========================= */
+
+    document.getElementById(
+        'hide-to-icon'
+    ).onclick = () => {
+
+        root.style.display = "none";
+
+        floatIcon.style.display = "flex";
+
+    };
+
+    /* =========================
+       10. COPY LICENSE
+    ========================= */
+
+    document.getElementById(
+        'copy-v9'
+    ).onclick = function(){
+
+        navigator.clipboard.writeText(
+            myUID
+        );
+
+        this.innerText = "COPIED";
+
+        setTimeout(() => {
+
+            this.innerText =
+                "COPY LICENSE";
+
+        },2000);
+
+    };
+
+})();
+</script>
+
+</body>
+  </html>
