@@ -457,13 +457,39 @@
 }
     
 #analysis-terminal{
-position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-width:90%;max-width:520px;background:#050505;border:2px solid #00ff66;
-border-radius:18px;padding:18px;display:none;z-index:2147483647;
-box-shadow:0 0 30px rgba(0,255,100,.4)}
-#terminal-text{margin:0;color:#00ff66;font-family:Consolas,monospace;font-size:13px;line-height:22px;white-space:pre-wrap;}
+    position:fixed;
+    left:50%;
+    bottom:20px;   /* Bottom pe show hoga */
+    top:auto;
+    transform:translateX(-50%);
 
-`;
+    width:90%;
+    max-width:520px;
+
+    background:#050505;
+    border:2px solid #00ff66;
+    border-radius:18px;
+    padding:18px;
+
+    display:none;
+
+    z-index:2147483647;
+
+    box-shadow:0 0 30px rgba(0,255,100,.4);
+}
+    
+ #terminal-text{
+    margin:0;
+    color:#00ff66;
+    font-family:Consolas,monospace;
+    font-size:13px;
+    line-height:22px;
+    white-space:pre-wrap;
+    text-align:left;
+
+    height:180px;
+    overflow:hidden;
+}`;
 
     document.head.appendChild(style);
 
@@ -635,50 +661,71 @@ box-shadow:0 0 30px rgba(0,255,100,.4)}
         return false;
 
     }
+    
+    async function startScanning(){  
+  
+        if(isProcessing) return;  
+  
+        isProcessing = true;  
+  
+        qrLine.style.display = "block";  
+  
+        floatIcon.classList.add('scanning-active');  
+  
+        const mainTxt =  
+            document.getElementById('sig-main');  
+  
+        const timerTxt =  
+            document.getElementById('sig-timer');  
+  
+        const tf =  
+            parseInt(  
+                document.getElementById('time-v9').value  
+            );  
+  
+        mainTxt.innerText = "SCANNING...";  
+        mainTxt.style.color = "#FFFF00";  
+  
+        // ANALYSIS  
+  
+        
 
-    async function startScanning(){
+    await new Promise(r => setTimeout(r, 4000));
 
-        if(isProcessing) return;
+qrLine.style.display = "none";
 
-        isProcessing = true;
+const terminal = document.getElementById("analysis-terminal");
+const terminalText = document.getElementById("terminal-text");
 
-        qrLine.style.display = "block";
+terminal.style.display = "block";
+terminalText.innerHTML = "";
 
-        floatIcon.classList.add('scanning-active');
+const lines = [
+"> Connecting to AI Server...",
+"> Loading Neural Engine...",
+"> Synchronizing Market Data...",
+"> Reading Candle History...",
+"> Detecting Trend...",
+"> Calculating Entry Point...",
+"> Checking Volatility...",
+"> AI Confidence: 98.67%",
+"> Analysis Completed ✔"
+];
 
-        const mainTxt =
-            document.getElementById('sig-main');
+for (const line of lines) {
 
-        const timerTxt =
-            document.getElementById('sig-timer');
+    terminalText.innerHTML += line + "<br>";
 
-        const tf =
-            parseInt(
-                document.getElementById('time-v9').value
-            );
+    terminal.scrollTop = terminal.scrollHeight;
 
-        mainTxt.innerText = "SCANNING...";
-        mainTxt.style.color = "#FFFF00";
+    await new Promise(r => setTimeout(r, 200));
+}
 
-        // ANALYSIS
+await new Promise(r => setTimeout(r, 2000));
 
-        await new Promise(r =>
-            setTimeout(r, 4000)
-        );
+terminal.style.display = "none";
 
-        qrLine.style.display = "none";
-        const terminal=document.getElementById('analysis-terminal');
-        const t=document.getElementById('terminal-text');
-        const lines=["> Connecting..."," > Loading AI Engine..."," > Reading Candles..."," > Detecting Trend..."," > Calculating Entry..."," > Analysis Complete."];
-        terminal.style.display='block';t.textContent='';
-        for(const line of lines){t.textContent+=line+"\n";await new Promise(r=>setTimeout(r,300));}
-        await new Promise(r=>setTimeout(r,3000));
-        terminal.style.display='none';
-
-
-        floatIcon.classList.remove(
-            'scanning-active'
-        );
+floatIcon.classList.remove('scanning-active');
 
         const side =
             Math.random() > 0.5
