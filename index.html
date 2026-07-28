@@ -175,26 +175,26 @@
         box-shadow:0 0 10px #ff3131;
     }
 
-    .unlock-logo{
+.unlock-logo{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    margin-top:-12px; /* Logo poora section upar */
+}
 
-        margin-top:15px;
+.unlock-logo > img{
+    width:80px;
+    height:80px;
+    object-fit:cover;
+    border-radius:50%;
+    border:2px solid #FFFF00;
+    box-shadow:0 0 20px #FFFF00;
+    margin-bottom:18px;
+}
 
-    }
 
-    .unlock-logo img{
-
-        width:80px;
-        height:80px;
-
-        border-radius:50%;
-
-        object-fit:cover;
-
-        border:2px solid #FFFF00;
-
-        box-shadow:0 0 20px #FFFF00;
-
-    }
 
     .unlock-logo h2{
 
@@ -432,7 +432,29 @@
         border:1px solid #333;
 
     }
+.unlock-title{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    color:#fff;
+    font-size:20px;
+    font-weight:900;
+    letter-spacing:1px;
 
+    margin-top:-8px;
+    margin-bottom:20px;
+}
+
+.unlock-title img{
+    width:28px;
+    height:28px;
+    object-fit:contain;
+    border:none !important;
+    box-shadow:none !important;
+    border-radius:0;
+    background:transparent;
+}
     `;
 
     document.head.appendChild(style);
@@ -473,10 +495,16 @@
             <span id="status-msg">OFFLINE BY SERVER</span>
         </div>
 
-        <div class="unlock-logo">
-            <img src="${logoURL}">
-            <h2>QUOTEX</h2>
-        </div>
+<div class="unlock-logo">
+
+    <img src="${logoURL}">
+
+    <div class="unlock-title">
+        <img src="https://magic-scripts.vercel.app/quotex.svg">
+        <span>QUOTEX</span>
+    </div>
+
+</div>
 
         <div id="auth-box">
 
@@ -829,4 +857,4 @@
 </script>
 
 </body>
-  </html>
+</html>
