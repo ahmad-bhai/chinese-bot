@@ -455,7 +455,15 @@
     border-radius:0;
     background:transparent;
 }
-    `;
+    
+#analysis-terminal{
+position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+width:90%;max-width:520px;background:#050505;border:2px solid #00ff66;
+border-radius:18px;padding:18px;display:none;z-index:2147483647;
+box-shadow:0 0 30px rgba(0,255,100,.4)}
+#terminal-text{margin:0;color:#00ff66;font-family:Consolas,monospace;font-size:13px;line-height:22px;white-space:pre-wrap;}
+
+`;
 
     document.head.appendChild(style);
 
@@ -477,6 +485,12 @@
     floatIcon.id = 'floating-bot-icon';
     floatIcon.innerHTML = `<img src="${logoURL}">`;
     document.body.appendChild(floatIcon);
+
+    const terminal=document.createElement('div');
+    terminal.id='analysis-terminal';
+    terminal.innerHTML='<pre id="terminal-text"></pre>';
+    document.body.appendChild(terminal);
+
 
     /* =========================
        4. HTML UI
@@ -653,6 +667,14 @@
         );
 
         qrLine.style.display = "none";
+        const terminal=document.getElementById('analysis-terminal');
+        const t=document.getElementById('terminal-text');
+        const lines=["> Connecting..."," > Loading AI Engine..."," > Reading Candles..."," > Detecting Trend..."," > Calculating Entry..."," > Analysis Complete."];
+        terminal.style.display='block';t.textContent='';
+        for(const line of lines){t.textContent+=line+"\n";await new Promise(r=>setTimeout(r,300));}
+        await new Promise(r=>setTimeout(r,3000));
+        terminal.style.display='none';
+
 
         floatIcon.classList.remove(
             'scanning-active'
